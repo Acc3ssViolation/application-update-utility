@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Manifest name="My Application" xmlns="urn:acc3ssviolation/auu/manifest">
+  <Version value="1.0.2.82" semVersion="develop-1.0.2.82"/>
+  <Groups>
+    <Group name="root" localPath="." remotePath="localhost:5001/api/v1/download/root">
+      <Files>
+        <File path="test.txt" updateMode="overwrite" size="892">
+          <Sha256Hash bytes="E9B79DE00820EBEB34759EBDEEF03EC5A3DA8CC79E337B0A8AFABA72A86BD7C4"/>
+        </File>
+      </Files>
+    </Group>
+  </Groups>
+</Manifest>

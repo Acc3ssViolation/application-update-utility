@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="auu-manifest"
+    elementFormDefault="qualified"
+    targetNamespace="urn:acc3ssviolation/auu/manifest"
+    xmlns="urn:acc3ssviolation/auu/manifest"
+    xmlns:mstns="urn:acc3ssviolation/auu/manifest"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:simpleType name="versionString">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]+\.[0-9]+(\.[0-9]+){0,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="updateMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="overwrite"/>
+      <xs:enumeration value="append"/>
+      <xs:enumeration value="new"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="sha256Hash">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9a-fA-F]{64}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:element name="Manifest">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="Version" minOccurs="0" maxOccurs="1" nillable="false">
+          <xs:complexType>
+            <xs:attribute name="value" type="versionString" use="required"/>
+            <xs:attribute name="semVersion" type="xs:string" use="optional" default=""/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Groups" minOccurs="0" maxOccurs="1" nillable="false">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Group" minOccurs="0" maxOccurs="unbounded" nillable="false">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Files" minOccurs="0" maxOccurs="1" nillable="false">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="File">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:choice minOccurs="0" maxOccurs="1">
+                                  <xs:element name="Sha256Hash">
+                                    <xs:complexType>
+                                      <xs:attribute name="bytes" type="sha256Hash"/>
+                                    </xs:complexType>
+                                  </xs:element>
+                                </xs:choice>
+                              </xs:sequence>
+                              <xs:attribute name="path" type="xs:anyURI" use="required"/>
+                              <xs:attribute name="updateMode" type="updateMode" use="optional" default="overwrite"/>
+                              <xs:attribute name="size" type="xs:positiveInteger" use="optional"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string" use="required"/>
+                  <xs:attribute name="localPath" type="xs:anyURI" use="required"/>
+                  <xs:attribute name="remotePath" type="xs:anyURI" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>   
+  </xs:element>
+</xs:schema>
