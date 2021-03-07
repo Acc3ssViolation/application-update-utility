@@ -31,7 +31,7 @@ namespace ApplicationUpdateUtility
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             options.Converters.Add(new JsonConverterByteArray());
             options.Converters.Add(new JsonConverterVersion());
-            options.WriteIndented = true;
+            options.WriteIndented = false;
             return JsonSerializer.Serialize(manifest, options);
         }
 
@@ -41,7 +41,7 @@ namespace ApplicationUpdateUtility
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             options.Converters.Add(new JsonConverterByteArray());
             options.Converters.Add(new JsonConverterVersion());
-            options.WriteIndented = true;
+            options.WriteIndented = false;
             return JsonSerializer.Deserialize<Manifest>(json, options);
         }
 
@@ -235,7 +235,7 @@ namespace ApplicationUpdateUtility
             return errors;
         }
 
-        static async Task<int> Update(string directory, string manifestUrl, bool allowDowngrades, bool force, bool quick, CancellationToken cancellationToken)
+        static async Task<int> Update(string directory, string manifestUrl, bool allowDowngrade, bool force, bool quick, CancellationToken cancellationToken)
         {
             var fullDirectory = Path.GetFullPath(directory);
             Directory.CreateDirectory(fullDirectory);
@@ -288,7 +288,7 @@ namespace ApplicationUpdateUtility
                     Console.WriteLine("Remote version is the same as local version, not updating");
                     return 0;
                 }
-                if (newManifest.Version < oldManifest.Version && !allowDowngrades)
+                if (newManifest.Version < oldManifest.Version && !allowDowngrade)
                 {
                     Console.WriteLine("Remote version is older than the local version, not updating");
                     return 0;
@@ -487,7 +487,7 @@ namespace ApplicationUpdateUtility
         {
             var files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories).Where(path => !path.EndsWith(ManifestFileName)).Select(filePath => Path.GetRelativePath(directoryPath, filePath));
 
-            var group = await CreateGroupDescriptionAsync(Path.GetFileName(directoryPath), directoryPath, remote, files, hashAlgorithm, updateMode, cancellationToken);
+            var group = await CreateGroupDescriptionAsync("directory-group", directoryPath, remote, files, hashAlgorithm, updateMode, cancellationToken);
             if (group is not null)
                 group.Path = groupPath;
             return group;
@@ -535,27 +535,6 @@ namespace ApplicationUpdateUtility
         {
             using var hash = System.Security.Cryptography.SHA256.Create();
             return await hash.ComputeHashAsync(stream, cancellationToken);
-        }
-
-        static async Task<Manifest?> FindLocalManifest(string folder)
-        {
-            const string fileName = "auu-manifest.xml";
-            var filePath = Path.Join(folder, fileName);
-
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    return await Manifest.LoadFromXmlFileAsync(filePath);
-                }
-                catch (ManifestParseException e)
-                {
-                    Console.WriteLine(e.ToString());
-                    return null;
-                }
-            }
-
-            return null;
         }
     }
 }
